@@ -32,6 +32,7 @@ import { HeroScreen } from "./screens/HeroScreen";
 import { IdentificacaoScreen } from "./screens/IdentificacaoScreen";
 import { ObjetivoScreen } from "./screens/ObjetivoScreen";
 import { PerfilScreen } from "./screens/PerfilScreen";
+import { ProvaScreen } from "./screens/ProvaScreen";
 import { ResultadoScreen } from "./screens/ResultadoScreen";
 
 export function Quiz() {
@@ -195,6 +196,8 @@ export function Quiz() {
           {screen === "analise" && <AnaliseScreen ms={state.analysisMs} />}
 
           {screen === "resultado" && <ResultadoScreen answers={answers} />}
+
+          {screen === "prova" && <ProvaScreen />}
 
           {screen === "captura" && (
             <CapturaScreen

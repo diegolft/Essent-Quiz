@@ -18,7 +18,23 @@ export const config = {
   vagas: 50,
   dias: 7,
   autoAdvance: true,
+  /** Prova social da tela de depoimentos. Conferir o número real antes de publicar. */
+  alunos: 120,
 };
+
+export type ProvaPrint = {
+  id: string;
+  /** Caminho do print em /public. `null` mantém o placeholder na tela. */
+  src: string | null;
+  alt: string;
+};
+
+/** Prints de WhatsApp dos alunos da consultoria. Trocar `src` quando chegarem. */
+export const PROVA_PRINTS: ProvaPrint[] = [
+  { id: "print-1", src: null, alt: "Aluno falando sobre o acompanhamento de perto" },
+  { id: "print-2", src: null, alt: "Aluno contando o resultado depois de meses travado" },
+  { id: "print-3", src: null, alt: "Aluno comentando a migração pro grupo fundador" },
+];
 
 export const ANALYSIS_MS = 6000;
 /** O contador chega a 100% um pouco antes do fim, pra não travar em 99. */

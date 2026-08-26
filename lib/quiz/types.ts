@@ -8,6 +8,7 @@ export type Screen =
   | "atrito"
   | "analise"
   | "resultado"
+  | "prova"
   | "captura"
   | "confirmacao";
 

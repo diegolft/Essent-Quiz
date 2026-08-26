@@ -1,4 +1,5 @@
 import { OBJETIVO_OPTS } from "./content";
+import { C, P } from "./tokens";
 import type { Answers } from "./types";
 
 export type Metrica = {
@@ -6,11 +7,21 @@ export type Metrica = {
   /** Percentual, no caso da consistência; a própria resposta dele nas outras. */
   valor: string;
   nota: string;
+  /** Cor do valor: verde quando está a favor dele, laranja quando pesa contra. */
+  hue: string;
+};
+
+/** Posição do usuário na escala de travamento, com a faixa em que ela cai. */
+export type Nivel = {
+  pct: number;
+  label: string;
+  hue: string;
 };
 
 export type Diagnostico = {
   headline: string;
   sub: string;
+  nivel: Nivel;
   metricas: Metrica[];
   gargaloTitulo: string;
   gargaloTexto: string;
@@ -163,6 +174,46 @@ const NOTA_BASE: Record<string, string> = {
   "Mais de 2 anos": "experiência é seu ativo, o plano respeita isso",
 };
 
+/** Quanto cada resposta soma de "capacidade" — o oposto do que trava. */
+const PESO_TEMPO_DIA: Record<string, number> = {
+  "Até 15 min": 25,
+  "15 a 30 min": 50,
+  "30 a 60 min": 75,
+  "Mais de 1h": 100,
+};
+
+const PESO_BASE: Record<string, number> = {
+  "Nunca treinei": 15,
+  "Até 6 meses": 40,
+  "6 meses a 2 anos": 70,
+  "Mais de 2 anos": 95,
+};
+
+/** Verde → âmbar → laranja: quanto mais alto o valor, melhor o estado. */
+function corPorForca(valor: number): string {
+  if (valor >= 70) return P.mint;
+  if (valor >= 45) return P.amber;
+  return C.orangeLight;
+}
+
+const FAIXAS: { ate: number; label: string; hue: string }[] = [
+  { ate: 30, label: "Baixo", hue: P.mint },
+  { ate: 55, label: "Normal", hue: P.amber },
+  { ate: 75, label: "Médio", hue: C.orangeLight },
+  { ate: 101, label: "Alto", hue: C.orange },
+];
+
+/**
+ * Nível de travamento: o inverso da capacidade que ele descreveu. A consistência
+ * pesa o dobro das outras — é o que mais derruba plano na prática.
+ */
+function nivelDeTravamento(consistencia: number, tempo: number, base: number): Nivel {
+  const capacidade = consistencia * 0.5 + tempo * 0.25 + base * 0.25;
+  const pct = Math.round(100 - capacidade);
+  const faixa = FAIXAS.find((f) => pct < f.ate) ?? FAIXAS[FAIXAS.length - 1];
+  return { pct, label: faixa.label, hue: faixa.hue };
+}
+
 /** Monta o diagnóstico a partir das respostas. Nada aqui é inventado. */
 export function diagnosticar(answers: Answers): Diagnostico {
   const dor = answers.identificacao;
@@ -173,28 +224,34 @@ export function diagnosticar(answers: Answers): Diagnostico {
   const opcao = OBJETIVO_OPTS.find((o) => o.id === objetivo);
 
   const pct = (6 - (answers.afirmacao ?? 3)) * 20;
+  const forcaTempo = PESO_TEMPO_DIA[answers.tempoDia ?? ""] ?? 50;
+  const forcaBase = PESO_BASE[answers.tempoTreino ?? ""] ?? 50;
 
   const metricas: Metrica[] = [
     {
       label: "Consistência hoje",
       valor: `${pct}%`,
       nota: NOTA_CONSISTENCIA[pct] ?? NOTA_CONSISTENCIA[60],
+      hue: corPorForca(pct),
     },
     {
       label: "Tempo por dia",
       valor: answers.tempoDia ?? "—",
       nota: NOTA_TEMPO_DIA[answers.tempoDia ?? ""] ?? "dá pra trabalhar com isso",
+      hue: corPorForca(forcaTempo),
     },
     {
       label: "Base de treino",
       valor: answers.tempoTreino ?? "—",
       nota: NOTA_BASE[answers.tempoTreino ?? ""] ?? "base suficiente pra avançar",
+      hue: corPorForca(forcaBase),
     },
   ];
 
   return {
     headline: veredito.h,
     sub: veredito.s,
+    nivel: nivelDeTravamento(pct, forcaTempo, forcaBase),
     metricas,
     gargaloTitulo: gargalo.t,
     gargaloTexto: gargalo.x,

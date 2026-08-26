@@ -1,9 +1,10 @@
 "use client";
 
 import Image from "next/image";
+import { useEffect, useState } from "react";
 
-import { diagnosticar, type Metrica } from "@/lib/quiz/resultado";
-import { C } from "@/lib/quiz/tokens";
+import { diagnosticar, type Metrica, type Nivel } from "@/lib/quiz/resultado";
+import { C, P } from "@/lib/quiz/tokens";
 import type { Answers } from "@/lib/quiz/types";
 import { EssentLogo } from "../ui/EssentMark";
 
@@ -56,6 +57,8 @@ export function ResultadoScreen({ answers }: { answers: Answers }) {
           {d.sub}
         </p>
 
+        <Termometro nivel={d.nivel} />
+
         <div className="mb-[26px] flex flex-col gap-[18px]">
           {d.metricas.map((m) => (
             <Linha key={m.label} metrica={m} />
@@ -90,6 +93,57 @@ function Kicker({ children }: { children: React.ReactNode }) {
   );
 }
 
+const FAIXAS_LABEL = ["Baixo", "Normal", "Médio", "Alto"];
+
+/** Escala de travamento: gradiente contínuo com o marcador na posição do usuário. */
+function Termometro({ nivel }: { nivel: Nivel }) {
+  // Anima do zero até a posição depois da montagem, senão o marcador já entra parado.
+  const [posicionado, setPosicionado] = useState(false);
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setPosicionado(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
+
+  return (
+    <div className="mb-[26px]">
+      <div className="mb-2.5 flex items-center justify-between gap-3">
+        <span className="text-text-muted text-[11.5px] font-bold tracking-[0.12em] uppercase">
+          Nível de travamento
+        </span>
+        <span
+          className="rounded-full px-2.5 py-1 text-[11px] font-bold tracking-[0.06em] uppercase"
+          style={{ background: nivel.hue, color: C.ink }}
+        >
+          {nivel.label}
+        </span>
+      </div>
+
+      <div
+        className="relative h-1.5 w-full rounded-full"
+        style={{
+          background: `linear-gradient(90deg, ${P.mint} 0%, ${P.amber} 42%, ${C.orangeLight} 72%, ${C.orange} 100%)`,
+        }}
+      >
+        <span
+          className="absolute top-1/2 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 bg-white"
+          style={{
+            left: `${posicionado ? nivel.pct : 0}%`,
+            borderColor: C.void,
+            boxShadow: `0 2px 10px rgba(0,0,0,0.55)`,
+            transition: "left .8s cubic-bezier(.2,.7,.3,1)",
+          }}
+        />
+      </div>
+
+      <div className="text-text-muted mt-2 flex justify-between text-[10.5px] tracking-[0.03em]">
+        {FAIXAS_LABEL.map((f) => (
+          <span key={f}>{f}</span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /** Métrica tipográfica: rótulo à esquerda, valor à direita, nota ocupando a linha de baixo. */
 function Linha({ metrica }: { metrica: Metrica }) {
   return (
@@ -97,7 +151,10 @@ function Linha({ metrica }: { metrica: Metrica }) {
       <span className="text-text-muted text-[11.5px] font-bold tracking-[0.12em] uppercase">
         {metrica.label}
       </span>
-      <span className="font-condensed text-right text-[19px] leading-none font-extrabold text-white">
+      <span
+        className="font-condensed text-right text-[19px] leading-none font-extrabold"
+        style={{ color: metrica.hue }}
+      >
         {metrica.valor}
       </span>
       <span className="text-text-muted col-span-2 text-[12.5px] leading-[1.4]">

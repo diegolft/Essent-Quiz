@@ -66,11 +66,13 @@ const FORWARD: Partial<Record<Screen, Screen>> = {
   objetivo: "afirmacao",
   afirmacao: "perfil",
   perfil: "compromisso",
-  resultado: "captura",
+  resultado: "prova",
+  prova: "captura",
   captura: "confirmacao",
 };
 
 const BACKWARD: Partial<Record<Screen, Screen>> = {
+  prova: "resultado",
   identificacao: "hero",
   objetivo: "identificacao",
   afirmacao: "objetivo",
@@ -89,7 +91,7 @@ export function nextScreen(state: QuizState): Screen {
 export function prevScreen(state: QuizState): Screen {
   // Quem entrou pela lista de espera não passou pela análise nem pelo resultado.
   if (state.screen === "captura") {
-    return state.mode === "espera" ? "atrito" : "resultado";
+    return state.mode === "espera" ? "atrito" : "prova";
   }
   return BACKWARD[state.screen] ?? "hero";
 }
@@ -120,6 +122,7 @@ export function showTopBar(screen: Screen): boolean {
     screen !== "hero" &&
     screen !== "analise" &&
     screen !== "resultado" &&
+    screen !== "prova" &&
     screen !== "confirmacao"
   );
 }
@@ -138,7 +141,9 @@ export function stepNumber(screen: Screen): number {
 }
 
 export function ctaLabel(state: QuizState): string {
-  if (state.screen === "resultado") return "Quero minha vaga";
+  // Escalada: reconhecer o problema → querer a vaga → confirmar.
+  if (state.screen === "resultado") return "Quero destravar isso";
+  if (state.screen === "prova") return "Quero minha vaga";
   if (state.screen !== "captura") return "Continuar";
   return state.mode === "espera" ? "Entrar na lista de espera" : "Confirmar minha vaga";
 }
