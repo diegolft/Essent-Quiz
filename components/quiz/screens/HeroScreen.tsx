@@ -33,7 +33,9 @@ export function HeroScreen({ onStart }: { onStart: () => void }) {
           <span>{config.dias} dias de inscrição</span>
         </div>
 
-        <PrimaryPill onClick={onStart}>Descobrir o que me trava</PrimaryPill>
+        <PrimaryPill onClick={onStart} className="cta-pulse">
+          Descobrir o que me trava
+        </PrimaryPill>
         <p className="text-text-muted m-0 mt-3.5 text-center text-[11.5px]">
           Sem cadastro. Só 6 perguntas.
         </p>

@@ -159,6 +159,24 @@ input:focus-visible,
   box-shadow: 0 10px 30px rgba(255, 90, 46, 0.32);
 }
 
+@keyframes ctaPulse {
+  0%,
+  100% {
+    box-shadow: 0 10px 30px rgba(255, 90, 46, 0.32);
+  }
+  50% {
+    box-shadow: 0 12px 42px rgba(255, 90, 46, 0.58);
+  }
+}
+
+/*
+ * Só o brilho respira: mexer no transform brigaria com o hover e o active
+ * do botão, que já usam translate.
+ */
+.cta-pulse {
+  animation: ctaPulse 2.6s ease-in-out infinite;
+}
+
 .multi-gradient {
   background: linear-gradient(90deg, #ff5a2e, #f7b32b, #35d6a4, #38bdf8, #a78bfa);
 }
@@ -215,7 +233,8 @@ input:focus-visible,
   .ring-mid,
   .ring-inner,
   .ring-core,
-  .dot-blip {
+  .dot-blip,
+  .cta-pulse {
     animation: none;
   }
 }
