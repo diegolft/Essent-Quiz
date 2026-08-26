@@ -21,11 +21,12 @@ app/                     layout (fontes), page, globals.css (tokens + keyframes)
 components/quiz/
   Quiz.tsx               estado, timers e persistência — o único lugar com efeitos
   TopBar / CtaBar        moldura fixa
-  screens/               as 10 telas
+  screens/               as 11 telas
   ui/                    cards, chips, escala Likert, botões, tipografia
 lib/quiz/
   content.ts             copy, opções, cores por item e config (vagas, dias, autoAdvance)
   reducer.ts             navegação e validação (puro)
+  resultado.ts           diagnóstico derivado das respostas (puro)
   phone.ts               máscara e validação do WhatsApp (puro)
   storage.ts             persistência em `essent-quiz-v1`
   tokens.ts              paleta e helpers de cor

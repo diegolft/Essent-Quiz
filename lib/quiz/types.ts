@@ -7,6 +7,7 @@ export type Screen =
   | "compromisso"
   | "atrito"
   | "analise"
+  | "resultado"
   | "captura"
   | "confirmacao";
 

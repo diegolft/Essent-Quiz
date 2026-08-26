@@ -32,6 +32,7 @@ import { HeroScreen } from "./screens/HeroScreen";
 import { IdentificacaoScreen } from "./screens/IdentificacaoScreen";
 import { ObjetivoScreen } from "./screens/ObjetivoScreen";
 import { PerfilScreen } from "./screens/PerfilScreen";
+import { ResultadoScreen } from "./screens/ResultadoScreen";
 
 export function Quiz() {
   const [state, dispatch] = useReducer(quizReducer, INITIAL_STATE);
@@ -72,7 +73,7 @@ export function Quiz() {
       if (ms >= ANALYSIS_MS) {
         if (analysisTick.current) clearInterval(analysisTick.current);
         analysisTick.current = null;
-        dispatch({ type: "goto", screen: "captura" });
+        dispatch({ type: "goto", screen: "resultado" });
       } else {
         dispatch({ type: "tick", ms });
       }
@@ -192,6 +193,8 @@ export function Quiz() {
           )}
 
           {screen === "analise" && <AnaliseScreen ms={state.analysisMs} />}
+
+          {screen === "resultado" && <ResultadoScreen answers={answers} />}
 
           {screen === "captura" && (
             <CapturaScreen

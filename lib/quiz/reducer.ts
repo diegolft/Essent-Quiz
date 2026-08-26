@@ -66,6 +66,7 @@ const FORWARD: Partial<Record<Screen, Screen>> = {
   objetivo: "afirmacao",
   afirmacao: "perfil",
   perfil: "compromisso",
+  resultado: "captura",
   captura: "confirmacao",
 };
 
@@ -86,9 +87,9 @@ export function nextScreen(state: QuizState): Screen {
 }
 
 export function prevScreen(state: QuizState): Screen {
-  // Quem entrou pela lista de espera não passou pela análise: volta ao atrito.
+  // Quem entrou pela lista de espera não passou pela análise nem pelo resultado.
   if (state.screen === "captura") {
-    return state.mode === "espera" ? "atrito" : "compromisso";
+    return state.mode === "espera" ? "atrito" : "resultado";
   }
   return BACKWARD[state.screen] ?? "hero";
 }
@@ -115,7 +116,12 @@ export function canAdvance(state: QuizState): boolean {
 }
 
 export function showTopBar(screen: Screen): boolean {
-  return screen !== "hero" && screen !== "analise" && screen !== "confirmacao";
+  return (
+    screen !== "hero" &&
+    screen !== "analise" &&
+    screen !== "resultado" &&
+    screen !== "confirmacao"
+  );
 }
 
 export function showCta(screen: Screen): boolean {
@@ -132,8 +138,9 @@ export function stepNumber(screen: Screen): number {
 }
 
 export function ctaLabel(state: QuizState): string {
+  if (state.screen === "resultado") return "Quero minha vaga";
   if (state.screen !== "captura") return "Continuar";
-  return state.mode === "espera" ? "Entrar na lista de espera" : "Quero minha vaga";
+  return state.mode === "espera" ? "Entrar na lista de espera" : "Confirmar minha vaga";
 }
 
 export function toPersisted(state: QuizState): PersistedState {

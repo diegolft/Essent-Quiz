@@ -106,3 +106,41 @@ apresentação. A página ocupa a viewport e é desenhada para mobile 390×810.
 
 Envio ao CRM, analytics, testes automatizados, autenticação e o asset oficial do
 logo (reproduzido como barra + wordmark, conforme o handoff).
+
+---
+
+## Adendo: tela de Resultado (posterior ao handoff)
+
+Tela nova, não prevista no handoff, inserida entre a **análise** e a **captura**
+no fluxo fundador. Motivo: a análise de 6s promete um diagnóstico e a captura
+entregava um formulário — o resultado paga essa promessa antes de pedir o
+contato. O fluxo de lista de espera não passa por ela.
+
+**Regra de conteúdo: nenhum número é inventado.** Toda linha sai de uma resposta
+que o usuário deu, em `lib/quiz/resultado.ts`:
+
+| Sinal | Vira |
+| --- | --- |
+| `identificacao` | nome e texto do perfil (4 variantes) |
+| `afirmacao` | medidor de consistência, **invertido** — a afirmação do passo 3 é negativa, então concordar 5 significa consistência 20% |
+| `tempoDia` | medidor de tempo |
+| `tempoTreino` | medidor de base |
+| `objetivo` | linha de fechamento, via o gancho já existente |
+
+O **menor medidor vira o gargalo** (empate resolve na ordem consistência →
+tempo → base), e o gargalo escolhe o texto que emenda no serviço. Dois usuários
+diferentes recebem vereditos diferentes.
+
+Uma exceção de tom: quem escolheu "nunca comecei de verdade" recebe outra nota
+de consistência — acusar de não sustentar uma rotina que ele nunca teve seria
+falso e desmotivador.
+
+### Integração
+
+- `Screen` ganha `"resultado"`; a análise passa a navegar para ela em vez da captura.
+- Sem barra de topo (preserva a contagem de 6 passos); com CTA.
+- Voltar da captura no fluxo fundador vai para o resultado, não mais para o compromisso.
+- Persiste normalmente — diferente da análise, é derivável das respostas.
+- **Divergência de copy assumida:** o CTA do resultado é "Quero minha vaga" e o da
+  captura virou "Confirmar minha vaga". O handoff fixa "Quero minha vaga" na captura,
+  mas mantê-lo deixaria dois CTAs idênticos em telas seguidas.
