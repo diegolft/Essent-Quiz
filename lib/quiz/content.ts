@@ -175,12 +175,13 @@ export function primeiroNome(nome: string): string {
   return nome.trim().split(" ")[0] || "Fera";
 }
 
-/** Passo de conteúdo exibido na barra de topo. Atrito mantém o contador em 5. */
+/** Passo exibido na barra de topo. Prova congela em 4 e atrito em 5. */
 export const STEP_NUM: Partial<Record<Screen, number>> = {
   identificacao: 1,
   objetivo: 2,
   afirmacao: 3,
   perfil: 4,
+  prova: 4,
   compromisso: 5,
   atrito: 5,
   captura: 6,

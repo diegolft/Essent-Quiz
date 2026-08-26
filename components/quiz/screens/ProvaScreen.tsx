@@ -7,8 +7,8 @@ import { StepScreen } from "../ui/ScreenLayout";
 import { Eyebrow } from "../ui/Typography";
 
 /**
- * Prova social entre o diagnóstico e a captura: quem já era acompanhado pelo
- * Gabriel está migrando pro grupo fundador.
+ * Prova social logo antes do gate de compromisso: é ali que a dúvida sobre o
+ * acompanhamento ser real aparece, e é ali que o funil mais perde gente.
  */
 export function ProvaScreen() {
   return (
@@ -26,8 +26,9 @@ export function ProvaScreen() {
           className="text-text-secondary m-0 mb-[26px] text-[14px] leading-[1.5]"
           style={{ textWrap: "pretty" }}
         >
-          A consultoria individual está sendo descontinuada. O grupo fundador é pra onde
-          esse acompanhamento vai — e boa parte dos alunos já garantiu a vaga.
+          A consultoria individual está sendo descontinuada e o grupo fundador é pra onde
+          esse acompanhamento vai. Quem passou por ele não estava mais motivado que você —
+          só teve alguém junto por 30 dias.
         </p>
       </div>
 
