@@ -57,7 +57,9 @@ export type ObjetivoOption = {
   icon: Icon;
   hue: Hue;
   photo: string;
+  /** Faixa larga do topo da tela de resultado — outra foto, porque o recorte é outro. */
   heroPhoto: string;
+  heroAlt: string;
   alt: string;
 };
 
@@ -79,7 +81,8 @@ export const OBJETIVO_OPTS: ObjetivoOption[] = [
     icon: Flame,
     hue: P.orange,
     photo: thumb("1571019613454-1cb2f99b2d8b"),
-    heroPhoto: hero("1571019613454-1cb2f99b2d8b"),
+    heroPhoto: hero("1550345332-09e3ac987658"),
+    heroAlt: "Mulher em esforço numa academia, luz dura em preto e branco",
     alt: "Pessoa treinando no chão de um estúdio",
   },
   {
@@ -89,7 +92,8 @@ export const OBJETIVO_OPTS: ObjetivoOption[] = [
     icon: Barbell,
     hue: P.cyan,
     photo: thumb("1517836357463-d25dfeac3438"),
-    heroPhoto: hero("1517836357463-d25dfeac3438"),
+    heroPhoto: hero("1581009146145-b5ef050c2e1e"),
+    heroAlt: "Homem executando uma série pesada com barra",
     alt: "Pessoa se posicionando para levantar uma barra",
   },
   {
@@ -99,7 +103,8 @@ export const OBJETIVO_OPTS: ObjetivoOption[] = [
     icon: TrendUp,
     hue: P.mint,
     photo: thumb("1526506118085-60ce8714f8c5"),
-    heroPhoto: hero("1526506118085-60ce8714f8c5"),
+    heroPhoto: hero("1583454110551-21f2fa2afe61"),
+    heroAlt: "Mãos segurando halteres num rack, veias em tensão",
     alt: "Costas definidas de uma pessoa em barra fixa",
   },
   {
@@ -110,6 +115,7 @@ export const OBJETIVO_OPTS: ObjetivoOption[] = [
     hue: P.violet,
     photo: thumb("1552674605-db6ffd4facb5"),
     heroPhoto: hero("1552674605-db6ffd4facb5"),
+    heroAlt: "Corredores em silhueta contra o sol",
     alt: "Corredores em silhueta contra o céu",
   },
 ];

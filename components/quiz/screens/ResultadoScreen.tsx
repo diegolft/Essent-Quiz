@@ -5,13 +5,15 @@ import Image from "next/image";
 import { diagnosticar, type Metrica } from "@/lib/quiz/resultado";
 import { C } from "@/lib/quiz/tokens";
 import type { Answers } from "@/lib/quiz/types";
+import { EssentLogo } from "../ui/EssentMark";
 
 /** Paga a promessa da análise: devolve o veredito lido das respostas antes de pedir o contato. */
 export function ResultadoScreen({ answers }: { answers: Answers }) {
   const d = diagnosticar(answers);
 
   return (
-    <div className="screen-in flex-1">
+    // O respiro do topo evita que a foto encoste na borda e pareça cortada.
+    <div className="screen-in flex-1 pt-6">
       <div className="relative h-[190px]">
         {d.foto ? (
           <Image
@@ -34,11 +36,8 @@ export function ResultadoScreen({ answers }: { answers: Answers }) {
             background: `linear-gradient(180deg, rgba(12,12,14,0.5) 0%, rgba(12,12,14,0) 30%, rgba(12,12,14,0) 68%, ${C.void} 100%)`,
           }}
         />
-        <div className="pointer-events-none absolute top-[18px] left-[22px] flex items-center gap-[7px]">
-          <div className="bg-orange h-[15px] w-[3px] rounded-[2px]" />
-          <span className="font-condensed text-[13px] font-extrabold tracking-[0.18em] text-white">
-            ESSENT
-          </span>
+        <div className="pointer-events-none absolute top-[18px] left-[22px]">
+          <EssentLogo markHeight={15} wordSize={13} />
         </div>
       </div>
 

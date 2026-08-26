@@ -200,6 +200,6 @@ export function diagnosticar(answers: Answers): Diagnostico {
     gargaloTexto: gargalo.x,
     fecho: (objetivo && FECHO[objetivo]) || FECHO_PADRAO,
     foto: opcao?.heroPhoto ?? null,
-    fotoAlt: opcao?.alt ?? "",
+    fotoAlt: opcao?.heroAlt ?? "",
   };
 }
