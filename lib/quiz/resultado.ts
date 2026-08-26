@@ -196,20 +196,29 @@ function corPorForca(valor: number): string {
   return C.orangeLight;
 }
 
+/**
+ * A escala começa em Médio por decisão de produto: ninguém sai do diagnóstico
+ * ouvindo que está bem. As três faixas cobrem a barra inteira.
+ */
+export const FAIXAS_TRAVAMENTO = ["Médio", "Alto", "Crítico"];
+
 const FAIXAS: { ate: number; label: string; hue: string }[] = [
-  { ate: 30, label: "Baixo", hue: P.mint },
-  { ate: 55, label: "Normal", hue: P.amber },
-  { ate: 75, label: "Médio", hue: C.orangeLight },
-  { ate: 101, label: "Alto", hue: C.orange },
+  { ate: 35, label: "Médio", hue: P.amber },
+  { ate: 72, label: "Alto", hue: C.orangeLight },
+  { ate: 101, label: "Crítico", hue: C.orange },
 ];
 
 /**
  * Nível de travamento: o inverso da capacidade que ele descreveu. A consistência
  * pesa o dobro das outras — é o que mais derruba plano na prática.
+ *
+ * O travamento cru raramente passa de 80, então ele é esticado pra ocupar a
+ * barra toda; o piso da escala é Médio, não Baixo.
  */
 function nivelDeTravamento(consistencia: number, tempo: number, base: number): Nivel {
   const capacidade = consistencia * 0.5 + tempo * 0.25 + base * 0.25;
-  const pct = Math.round(100 - capacidade);
+  const travamento = 100 - capacidade;
+  const pct = Math.max(0, Math.min(100, Math.round(travamento * 1.25)));
   const faixa = FAIXAS.find((f) => pct < f.ate) ?? FAIXAS[FAIXAS.length - 1];
   return { pct, label: faixa.label, hue: faixa.hue };
 }

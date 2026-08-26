@@ -3,7 +3,12 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
-import { diagnosticar, type Metrica, type Nivel } from "@/lib/quiz/resultado";
+import {
+  FAIXAS_TRAVAMENTO,
+  diagnosticar,
+  type Metrica,
+  type Nivel,
+} from "@/lib/quiz/resultado";
 import { C, P } from "@/lib/quiz/tokens";
 import type { Answers } from "@/lib/quiz/types";
 import { EssentLogo } from "../ui/EssentMark";
@@ -93,7 +98,6 @@ function Kicker({ children }: { children: React.ReactNode }) {
   );
 }
 
-const FAIXAS_LABEL = ["Baixo", "Normal", "Médio", "Alto"];
 
 /** Escala de travamento: gradiente contínuo com o marcador na posição do usuário. */
 function Termometro({ nivel }: { nivel: Nivel }) {
@@ -121,7 +125,7 @@ function Termometro({ nivel }: { nivel: Nivel }) {
       <div
         className="relative h-1.5 w-full rounded-full"
         style={{
-          background: `linear-gradient(90deg, ${P.mint} 0%, ${P.amber} 42%, ${C.orangeLight} 72%, ${C.orange} 100%)`,
+          background: `linear-gradient(90deg, ${P.amber} 0%, ${C.orangeLight} 55%, ${C.orange} 100%)`,
         }}
       >
         <span
@@ -136,7 +140,7 @@ function Termometro({ nivel }: { nivel: Nivel }) {
       </div>
 
       <div className="text-text-muted mt-2 flex justify-between text-[10.5px] tracking-[0.03em]">
-        {FAIXAS_LABEL.map((f) => (
+        {FAIXAS_TRAVAMENTO.map((f) => (
           <span key={f}>{f}</span>
         ))}
       </div>
