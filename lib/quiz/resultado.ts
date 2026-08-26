@@ -1,170 +1,205 @@
-import { ganchoDe } from "./content";
-import { P, type Hue } from "./tokens";
+import { OBJETIVO_OPTS } from "./content";
 import type { Answers } from "./types";
 
-export type Medidor = {
-  /** Chave da dimensão, usada pra escolher o texto do gargalo. */
-  key: "consistencia" | "tempo" | "base";
+export type Metrica = {
   label: string;
-  /** O que aparece à direita: o percentual ou a própria resposta dele. */
+  /** Percentual, no caso da consistência; a própria resposta dele nas outras. */
   valor: string;
-  pct: number;
-  hue: Hue;
   nota: string;
 };
 
 export type Diagnostico = {
-  perfilTitulo: string;
-  perfilTexto: string;
-  medidores: Medidor[];
-  gargalo: Medidor;
+  headline: string;
+  sub: string;
+  metricas: Metrica[];
   gargaloTitulo: string;
   gargaloTexto: string;
-  fechamento: string;
+  fecho: string;
+  foto: string | null;
+  fotoAlt: string;
 };
 
-/** O perfil é a dor que ele mesmo escolheu no passo 1. */
-const PERFIS: Record<string, { titulo: string; texto: string }> = {
+type Veredito = { h: string; s: string };
+
+/** O veredito cruza a dor do passo 1 com o objetivo do passo 2 — 16 combinações. */
+const VEREDITO: Record<string, Record<string, Veredito>> = {
   sem_plano: {
-    titulo: "Você tá no esforço sem direção.",
-    texto:
-      "Treinar, você treina. O que falta é saber se o que você faz hoje te leva a algum lugar — e isso não se resolve com mais treino, se resolve com plano.",
+    emagrecimento: {
+      h: "Você tá treinando no escuro.",
+      s: "Treinar sem plano queima tempo, não gordura. Sem medir o que muda, você repete o mesmo mês achando que avançou.",
+    },
+    hipertrofia: {
+      h: "Você tá treinando sem progressão.",
+      s: "Músculo responde a carga que sobe. Sem plano, o estímulo fica igual e o corpo não tem motivo pra mudar.",
+    },
+    recomposicao: {
+      h: "Você tá remando pros dois lados.",
+      s: "Perder gordura e ganhar músculo ao mesmo tempo é a meta mais técnica que existe. Sem plano, uma parte sempre cancela a outra.",
+    },
+    performance: {
+      h: "Você tá treinando sem alvo.",
+      s: "Condicionamento é a soma de sessões que conversam entre si. Sem plano, cada treino recomeça do zero.",
+    },
   },
   sem_sustentar: {
-    titulo: "Você tá no ciclo do recomeço.",
-    texto:
-      "Não é falta de esforço. Você já provou que consegue começar — três, quatro vezes. O que nunca teve foi alguém segurando o plano com você depois da segunda semana.",
+    emagrecimento: {
+      h: "Você tá no ciclo do recomeço.",
+      s: "O problema não foi nenhuma das dietas. Foi que todas exigiam uma vida que não é a sua.",
+    },
+    hipertrofia: {
+      h: "Você treina, mas não come pra crescer.",
+      s: "Hipertrofia é o objetivo que exige constância na cozinha antes da academia. É ali que suas tentativas caíram.",
+    },
+    recomposicao: {
+      h: "Você tá trocando de estratégia, não de corpo.",
+      s: "Recomposição leva semanas pra aparecer. Cada troca de plano zera o cronômetro.",
+    },
+    performance: {
+      h: "Você começa forte e para no meio.",
+      s: "Performance se constrói em bloco, semanas somando. Recomeçar sempre te devolve ao mesmo ponto.",
+    },
   },
   travado: {
-    titulo: "Você tá num platô.",
-    texto:
-      "Você já fez a parte difícil: saiu do zero. Só que platô não quebra repetindo o que funcionou antes — quebra ajustando o que mudou em você desde então.",
+    emagrecimento: {
+      h: "Você tá no platô, não no fim.",
+      s: "Peso parado depois de uma fase boa quase nunca é falta de esforço. É o plano que envelheceu.",
+    },
+    hipertrofia: {
+      h: "Você tá repetindo o estímulo que já funcionou.",
+      s: "O que te trouxe até aqui é exatamente o que te segura agora. Carga, volume e descanso precisam mudar de lugar.",
+    },
+    recomposicao: {
+      h: "Você tá firme, mas na mesma composição.",
+      s: "A balança pode ficar igual enquanto o corpo muda — ou enquanto nada muda. Sem medir, dá no mesmo.",
+    },
+    performance: {
+      h: "Você bateu no teto do método atual.",
+      s: "Ritmo, potência e recuperação param juntos quando o treino não é periodizado.",
+    },
   },
   nunca_comecei: {
-    titulo: "Você tá na largada adiada.",
-    texto:
-      "Nunca começar de verdade não é preguiça. É não ter um primeiro passo pequeno o suficiente pra caber na sua semana real.",
+    emagrecimento: {
+      h: "Você tá na largada adiada.",
+      s: "Nunca começar de verdade não é preguiça. É não ter um primeiro passo pequeno o suficiente pra caber na sua semana real.",
+    },
+    hipertrofia: {
+      h: "Você tá na largada adiada.",
+      s: "Nunca começar de verdade não é preguiça. É que ninguém te mostrou como são simples os primeiros meses de quem quer ganhar massa.",
+    },
+    recomposicao: {
+      h: "Você tá na largada adiada.",
+      s: "Nunca começar de verdade não é preguiça. É que recomposição parece complexa demais pra quem ainda não deu o primeiro passo.",
+    },
+    performance: {
+      h: "Você tá na largada adiada.",
+      s: "Nunca começar de verdade não é preguiça. É não ter um primeiro passo pequeno o suficiente pra caber na sua semana real.",
+    },
   },
 };
 
-const PERFIL_PADRAO = {
-  titulo: "Você tá pronto pra sair do lugar.",
-  texto:
-    "Pelo que você respondeu, o que falta não é vontade — é um plano que caiba na sua rotina e alguém acompanhando de perto.",
+const VEREDITO_PADRAO: Veredito = {
+  h: "Seu diagnóstico tá pronto.",
+  s: "Pelo que você respondeu, o que falta não é vontade — é um plano que caiba na sua rotina e alguém acompanhando de perto.",
 };
+
+/** O gargalo vem da dor escolhida no passo 1. */
+const GARGALO: Record<string, { t: string; x: string }> = {
+  sem_plano: {
+    t: "Seu gargalo: direção",
+    x: "Você não precisa treinar mais. Precisa saber se o que fez essa semana te deixou mais perto. Isso é plano, não disciplina.",
+  },
+  sem_sustentar: {
+    t: "Seu gargalo: sustentação",
+    x: "Você já provou que consegue começar. O que falta é um plano que sobreviva a uma semana ruim.",
+  },
+  travado: {
+    t: "Seu gargalo: ajuste",
+    x: "Quem travou não precisa de mais vontade. Precisa de alguém olhando os números e mexendo na variável certa.",
+  },
+  nunca_comecei: {
+    t: "Seu gargalo: base",
+    x: "Começar sozinho é onde a maioria trava. Trinta dias acompanhado de perto valem mais que os seis meses seguintes no escuro.",
+  },
+};
+
+const GARGALO_PADRAO = {
+  t: "Seu gargalo: acompanhamento",
+  x: "Trinta dias com alguém olhando o que você faz valem mais que seis meses tentando adivinhar sozinho.",
+};
+
+const FECHO: Record<string, string> = {
+  emagrecimento: "Com esse perfil, emagrecer sem regredir é método, não força de vontade.",
+  hipertrofia: "Com esse perfil, ganhar massa é método, não força de vontade.",
+  recomposicao: "Com esse perfil, recompor o corpo é método, não força de vontade.",
+  performance: "Com esse perfil, destravar sua performance é método, não força de vontade.",
+};
+
+const FECHO_PADRAO = "Com esse perfil, sair do lugar é método, não força de vontade.";
 
 /**
- * A afirmação do passo 3 é negativa ("sei o que fazer, mas não consigo manter
- * consistência"), então concordar muito significa consistência baixa.
+ * Notas da consistência, indexadas pelo percentual — não pela nota da escala.
+ * A afirmação do passo 3 é negativa ("não consigo manter consistência"), então
+ * concordar com ela significa consistência baixa: o percentual inverte a nota.
  */
-function medidorConsistencia(afirmacao: number | null, identificacao: string | null): Medidor {
-  const nota = afirmacao ?? 3;
-  const pct = (6 - nota) * 20;
-  const hue = pct <= 40 ? P.pink : pct <= 60 ? P.amber : P.mint;
-
-  // Quem nunca começou não tem rotina pra sustentar: seria acusar de um vício que ele não tem.
-  const texto =
-    identificacao === "nunca_comecei" && pct <= 60
-      ? "sem rotina fixa ainda — é ponto de partida, não defeito"
-      : pct <= 40
-        ? "você mesmo disse: sabe o que fazer, mas não sustenta"
-        : pct <= 60
-          ? "vai bem por um tempo e depois escapa"
-          : "você sustenta o que começa — falta direcionar";
-
-  return { key: "consistencia", label: "Consistência hoje", valor: `${pct}%`, pct, hue, nota: texto };
-}
-
-const TEMPO_DIA: Record<string, { pct: number; nota: string }> = {
-  "Até 15 min": { pct: 25, nota: "pouco, mas suficiente se cada minuto tiver função" },
-  "15 a 30 min": { pct: 50, nota: "dá pra montar a semana inteira nessa janela" },
-  "30 a 60 min": { pct: 75, nota: "espaço de sobra pra progressão" },
-  "Mais de 1h": { pct: 100, nota: "tempo não é o seu limite" },
+const NOTA_CONSISTENCIA: Record<number, string> = {
+  20: "você mesmo disse: sabe o que fazer, mas não sustenta",
+  40: "você mesmo disse: sabe o que fazer, mas não sustenta",
+  60: "meio a meio: some quando a semana aperta",
+  80: "consistência quase não é o seu problema",
+  100: "consistência não é o seu problema — é direção",
 };
 
-const TEMPO_TREINO: Record<string, { pct: number; nota: string }> = {
-  "Nunca treinei": { pct: 15, nota: "começar do zero é vantagem: nenhum vício pra desfazer" },
-  "Até 6 meses": { pct: 40, nota: "cedo o bastante pra corrigir execução sem trauma" },
-  "6 meses a 2 anos": { pct: 70, nota: "base sólida, dá pra puxar mais" },
-  "Mais de 2 anos": { pct: 95, nota: "experiência é o que você tem de sobra" },
+const NOTA_TEMPO_DIA: Record<string, string> = {
+  "Até 15 min": "pouco tempo exige plano enxuto",
+  "15 a 30 min": "dá pra fazer muito com 30 min bem usados",
+  "30 a 60 min": "tempo suficiente pra treino completo",
+  "Mais de 1h": "tempo não é o seu limite",
 };
 
-/** Prioridade em caso de empate: consistência pesa mais que tempo, tempo mais que base. */
-const PRIORIDADE: Medidor["key"][] = ["consistencia", "tempo", "base"];
+const NOTA_BASE: Record<string, string> = {
+  "Nunca treinei": "começar do zero é vantagem: nenhum vício pra desfazer",
+  "Até 6 meses": "base recente: hora de estruturar",
+  "6 meses a 2 anos": "você já tem base pra progressão real",
+  "Mais de 2 anos": "experiência é seu ativo, o plano respeita isso",
+};
 
-function menorMedidor(medidores: Medidor[]): Medidor {
-  return medidores.reduce((menor, atual) => {
-    if (atual.pct < menor.pct) return atual;
-    if (atual.pct > menor.pct) return menor;
-    return PRIORIDADE.indexOf(atual.key) < PRIORIDADE.indexOf(menor.key) ? atual : menor;
-  });
-}
-
-function textoGargalo(gargalo: Medidor, answers: Answers): { titulo: string; texto: string } {
-  switch (gargalo.key) {
-    case "consistencia":
-      return {
-        titulo: "Seu gargalo: consistência",
-        texto:
-          "Seu problema não é conhecimento — é não ter ninguém do lado nos primeiros 30 dias. É exatamente isso que o grupo fundador faz.",
-      };
-    case "tempo":
-      return {
-        titulo: "Seu gargalo: tempo",
-        texto: `Com ${(answers.tempoDia ?? "o tempo que você tem").toLowerCase()} por dia dá pra ir longe — desde que cada minuto esteja no lugar certo. Montar essa semana é o nosso trabalho.`,
-      };
-    case "base":
-      return {
-        titulo: "Seu gargalo: base",
-        texto:
-          "Começar sozinho é onde a maioria trava. Trinta dias acompanhado de perto valem mais que os seis meses seguintes no escuro.",
-      };
-  }
-}
-
-/**
- * Monta o diagnóstico a partir das respostas. Nenhum número é inventado: todos
- * saem direto do que o usuário respondeu nos passos 3, 4 e 5.
- */
+/** Monta o diagnóstico a partir das respostas. Nada aqui é inventado. */
 export function diagnosticar(answers: Answers): Diagnostico {
-  const perfil = (answers.identificacao && PERFIS[answers.identificacao]) || PERFIL_PADRAO;
+  const dor = answers.identificacao;
+  const objetivo = answers.objetivo;
 
-  const dia = TEMPO_DIA[answers.tempoDia ?? ""] ?? { pct: 50, nota: "dá pra trabalhar com isso" };
-  const treino = TEMPO_TREINO[answers.tempoTreino ?? ""] ?? {
-    pct: 50,
-    nota: "base suficiente pra avançar",
-  };
+  const veredito = (dor && objetivo && VEREDITO[dor]?.[objetivo]) || VEREDITO_PADRAO;
+  const gargalo = (dor && GARGALO[dor]) || GARGALO_PADRAO;
+  const opcao = OBJETIVO_OPTS.find((o) => o.id === objetivo);
 
-  const medidores: Medidor[] = [
-    medidorConsistencia(answers.afirmacao, answers.identificacao),
+  const pct = (6 - (answers.afirmacao ?? 3)) * 20;
+
+  const metricas: Metrica[] = [
     {
-      key: "tempo",
-      label: "Tempo por dia",
-      valor: answers.tempoDia ?? "—",
-      pct: dia.pct,
-      hue: P.cyan,
-      nota: dia.nota,
+      label: "Consistência hoje",
+      valor: `${pct}%`,
+      nota: NOTA_CONSISTENCIA[pct] ?? NOTA_CONSISTENCIA[60],
     },
     {
-      key: "base",
+      label: "Tempo por dia",
+      valor: answers.tempoDia ?? "—",
+      nota: NOTA_TEMPO_DIA[answers.tempoDia ?? ""] ?? "dá pra trabalhar com isso",
+    },
+    {
       label: "Base de treino",
       valor: answers.tempoTreino ?? "—",
-      pct: treino.pct,
-      hue: P.violet,
-      nota: treino.nota,
+      nota: NOTA_BASE[answers.tempoTreino ?? ""] ?? "base suficiente pra avançar",
     },
   ];
 
-  const gargalo = menorMedidor(medidores);
-  const { titulo, texto } = textoGargalo(gargalo, answers);
-
   return {
-    perfilTitulo: perfil.titulo,
-    perfilTexto: perfil.texto,
-    medidores,
-    gargalo,
-    gargaloTitulo: titulo,
-    gargaloTexto: texto,
-    fechamento: `Com esse perfil, ${ganchoDe(answers.objetivo)} é método, não força de vontade.`,
+    headline: veredito.h,
+    sub: veredito.s,
+    metricas,
+    gargaloTitulo: gargalo.t,
+    gargaloTexto: gargalo.x,
+    fecho: (objetivo && FECHO[objetivo]) || FECHO_PADRAO,
+    foto: opcao?.heroPhoto ?? null,
+    fotoAlt: opcao?.alt ?? "",
   };
 }

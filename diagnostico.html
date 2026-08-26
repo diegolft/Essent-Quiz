@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Essent — Tela de diagnóstico</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap">
+<style>
+  /* Tokens da identidade Essent */
+  :root {
+    --void: #0c0c0e;
+    --panel: #17140f;
+    --border: #332a20;
+    --border-soft: #241f19;
+    --orange: #ff5a2e;
+    --orange-light: #ff7a45;
+    --on-orange: #2b0f04;
+    --text: #ffffff;
+    --text-secondary: #c9c9c0;
+    --text-muted: #8a857b;
+    --font-display: 'Barlow Condensed', sans-serif;
+    --font-body: 'Barlow', system-ui, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: #050506; }
+  body {
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 26px 12px;
+  }
+  a { color: var(--orange-light); text-decoration: none; }
+  a:hover { color: var(--orange); }
+
+  /* Moldura só de apresentação — não implementar no app */
+  .frame {
+    width: 390px;
+    height: 810px;
+    background: var(--void);
+    border-radius: 42px;
+    border: 8px solid #1a1a1a;
+    box-shadow: 0 34px 90px rgba(0,0,0,0.65);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .scroll { flex: 1; overflow-y: auto; animation: screenIn .34s cubic-bezier(.2,.7,.3,1) both; }
+  @keyframes screenIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+  /* Faixa de imagem */
+  .hero { position: relative; height: 190px; }
+  .hero-photo { position: absolute; inset: 0; overflow: hidden; }
+  .hero-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .hero-photo:empty::after,
+  .hero-photo img[src=""] { content: ""; }
+  .hero-fallback {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--panel);
+    color: #55504a; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .hero-scrim {
+    position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(180deg, rgba(12,12,14,0.5) 0%, rgba(12,12,14,0) 30%, rgba(12,12,14,0) 68%, var(--void) 100%);
+  }
+  .brand {
+    position: absolute; left: 22px; top: 18px;
+    display: flex; align-items: center; gap: 7px; pointer-events: none;
+  }
+  .brand-bar { width: 3px; height: 15px; background: var(--orange); border-radius: 2px; }
+  .brand-word {
+    font-family: var(--font-display); font-weight: 800; font-size: 13px;
+    letter-spacing: 0.18em; color: var(--text);
+  }
+
+  .body { padding: 4px 22px 8px 22px; }
+
+  .eyebrow {
+    color: var(--orange-light); font-size: 10.5px; font-weight: 700;
+    letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 8px;
+  }
+  h1 {
+    font-family: var(--font-display); font-weight: 800; font-size: 34px;
+    line-height: 0.97; text-transform: uppercase; color: var(--text);
+    margin: 0 0 12px 0; text-wrap: balance;
+  }
+  .sub {
+    color: var(--text-secondary); font-size: 14px; line-height: 1.55;
+    margin: 0 0 26px 0; text-wrap: pretty;
+  }
+
+  /* Dados do diagnóstico — tipográficos, sem barra */
+  .metrics { display: flex; flex-direction: column; gap: 18px; margin-bottom: 26px; }
+  .metric { display: grid; grid-template-columns: 1fr auto; gap: 5px 12px; }
+  .metric-label {
+    font-size: 11.5px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--text-muted);
+  }
+  .metric-value {
+    font-family: var(--font-display); font-weight: 800; font-size: 19px;
+    line-height: 1; color: var(--text); text-align: right;
+  }
+  .metric-note {
+    grid-column: 1 / -1; font-size: 12.5px; color: var(--text-muted); line-height: 1.4;
+  }
+
+  /* Gargalo */
+  .bottleneck { display: flex; gap: 14px; align-items: stretch; margin-bottom: 22px; }
+  .bottleneck-rule { width: 3px; background: var(--orange); border-radius: 2px; flex-shrink: 0; }
+  .bottleneck-text {
+    color: var(--text); font-family: var(--font-body); font-style: italic; font-weight: 500;
+    font-size: 15.5px; line-height: 1.45; margin: 0; text-wrap: pretty;
+  }
+
+  .close { color: var(--text-muted); font-size: 13px; line-height: 1.5; margin: 0; }
+
+  /* CTA */
+  .cta-bar { padding: 14px 20px 22px 20px; flex-shrink: 0; }
+  .cta {
+    width: 100%; font-family: var(--font-body); padding: 17px 20px; border-radius: 999px;
+    border: none; font-size: 15px; font-weight: 800; cursor: pointer;
+    background: linear-gradient(180deg, var(--orange-light) 0%, var(--orange) 100%);
+    color: var(--on-orange); box-shadow: 0 10px 30px rgba(255,90,46,0.34);
+    transition: transform .12s ease, box-shadow .2s ease;
+  }
+  .cta:hover { transform: translateY(-1px); box-shadow: 0 14px 36px rgba(255,90,46,0.44); }
+  .cta:active { transform: translateY(1px); }
+  .cta:focus-visible { outline: 2px solid var(--orange-light); outline-offset: 2px; }
+</style>
+</head>
+<body>
+
+<!--
+  TELA DE DIAGNÓSTICO (entra depois da análise de 6s, antes da captura de WhatsApp).
+  Referência de design: recriar no ambiente do app, não copiar este HTML.
+
+  O conteúdo é montado a partir de:
+    dor        = resposta da tela 2 (identificação)
+    objetivo   = resposta da tela 3
+    afirmacao  = escala 1-5 da tela 4
+    tempoDia   = chip da tela 5
+    tempoTreino= chip da tela 5
+
+  Abra com ?dor=travado&objetivo=hipertrofia para ver outras combinações.
+  Foto: uma por objetivo, 100% de largura, 190px de altura, object-fit: cover.
+-->
+
+<div class="frame">
+  <div class="scroll">
+    <div class="hero">
+      <div class="hero-photo">
+        <div class="hero-fallback" id="foto-fallback">Foto do objetivo</div>
+        <!-- <img src="…" alt=""> -->
+      </div>
+      <div class="hero-scrim"></div>
+      <div class="brand">
+        <div class="brand-bar"></div>
+        <span class="brand-word">ESSENT</span>
+      </div>
+    </div>
+
+    <div class="body">
+      <div class="eyebrow">Diagnóstico pronto</div>
+      <h1 id="headline">Você tá na largada adiada.</h1>
+      <p class="sub" id="sub"></p>
+
+      <div class="metrics" id="metrics"></div>
+
+      <div class="bottleneck">
+        <div class="bottleneck-rule"></div>
+        <div>
+          <div class="eyebrow" id="gargalo-titulo"></div>
+          <p class="bottleneck-text" id="gargalo-texto"></p>
+        </div>
+      </div>
+
+      <p class="close" id="fecho"></p>
+    </div>
+  </div>
+
+  <div class="cta-bar">
+    <button class="cta" type="button">Quero minha vaga</button>
+  </div>
+</div>
+
+<script type="application/json" id="diagnostico-data">
+{
+  "veredito": {
+    "sem_plano": {
+      "emagrecimento": { "h": "Você tá treinando no escuro.", "s": "Treinar sem plano queima tempo, não gordura. Sem medir o que muda, você repete o mesmo mês achando que avançou." },
+      "hipertrofia":   { "h": "Você tá treinando sem progressão.", "s": "Músculo responde a carga que sobe. Sem plano, o estímulo fica igual e o corpo não tem motivo pra mudar." },
+      "recomposicao":  { "h": "Você tá remando pros dois lados.", "s": "Perder gordura e ganhar músculo ao mesmo tempo é a meta mais técnica que existe. Sem plano, uma parte sempre cancela a outra." },
+      "performance":   { "h": "Você tá treinando sem alvo.", "s": "Condicionamento é a soma de sessões que conversam entre si. Sem plano, cada treino recomeça do zero." }
+    },
+    "sem_sustentar": {
+      "emagrecimento": { "h": "Você tá no ciclo do recomeço.", "s": "O problema não foi nenhuma das dietas. Foi que todas exigiam uma vida que não é a sua." },
+      "hipertrofia":   { "h": "Você treina, mas não come pra crescer.", "s": "Hipertrofia é o objetivo que exige constância na cozinha antes da academia. É ali que suas tentativas caíram." },
+      "recomposicao":  { "h": "Você tá trocando de estratégia, não de corpo.", "s": "Recomposição leva semanas pra aparecer. Cada troca de plano zera o cronômetro." },
+      "performance":   { "h": "Você começa forte e para no meio.", "s": "Performance se constrói em bloco, semanas somando. Recomeçar sempre te devolve ao mesmo ponto." }
+    },
+    "travado": {
+      "emagrecimento": { "h": "Você tá no platô, não no fim.", "s": "Peso parado depois de uma fase boa quase nunca é falta de esforço. É o plano que envelheceu." },
+      "hipertrofia":   { "h": "Você tá repetindo o estímulo que já funcionou.", "s": "O que te trouxe até aqui é exatamente o que te segura agora. Carga, volume e descanso precisam mudar de lugar." },
+      "recomposicao":  { "h": "Você tá firme, mas na mesma composição.", "s": "A balança pode ficar igual enquanto o corpo muda — ou enquanto nada muda. Sem medir, dá no mesmo." },
+      "performance":   { "h": "Você bateu no teto do método atual.", "s": "Ritmo, potência e recuperação param juntos quando o treino não é periodizado." }
+    },
+    "nunca_comecei": {
+      "emagrecimento": { "h": "Você tá na largada adiada.", "s": "Nunca começar de verdade não é preguiça. É não ter um primeiro passo pequeno o suficiente pra caber na sua semana real." },
+      "hipertrofia":   { "h": "Você tá na largada adiada.", "s": "Nunca começar de verdade não é preguiça. É que ninguém te mostrou como são simples os primeiros meses de quem quer ganhar massa." },
+      "recomposicao":  { "h": "Você tá na largada adiada.", "s": "Nunca começar de verdade não é preguiça. É que recomposição parece complexa demais pra quem ainda não deu o primeiro passo." },
+      "performance":   { "h": "Você tá na largada adiada.", "s": "Nunca começar de verdade não é preguiça. É não ter um primeiro passo pequeno o suficiente pra caber na sua semana real." }
+    }
+  },
+  "gargalo": {
+    "sem_plano":     { "t": "Seu gargalo: direção",    "x": "Você não precisa treinar mais. Precisa saber se o que fez essa semana te deixou mais perto. Isso é plano, não disciplina." },
+    "sem_sustentar": { "t": "Seu gargalo: sustentação", "x": "Você já provou que consegue começar. O que falta é um plano que sobreviva a uma semana ruim." },
+    "travado":       { "t": "Seu gargalo: ajuste",      "x": "Quem travou não precisa de mais vontade. Precisa de alguém olhando os números e mexendo na variável certa." },
+    "nunca_comecei": { "t": "Seu gargalo: base",        "x": "Começar sozinho é onde a maioria trava. Trinta dias acompanhado de perto valem mais que os seis meses seguintes no escuro." }
+  },
+  "fecho": {
+    "emagrecimento": "Com esse perfil, emagrecer sem regredir é método, não força de vontade.",
+    "hipertrofia":   "Com esse perfil, ganhar massa é método, não força de vontade.",
+    "recomposicao":  "Com esse perfil, recompor o corpo é método, não força de vontade.",
+    "performance":   "Com esse perfil, destravar sua performance é método, não força de vontade."
+  },
+  "notaConsistencia": {
+    "1": "você mesmo disse: sabe o que fazer, mas não sustenta",
+    "2": "você mesmo disse: sabe o que fazer, mas não sustenta",
+    "3": "meio a meio: some quando a semana aperta",
+    "4": "consistência quase não é o seu problema",
+    "5": "consistência não é o seu problema — é direção"
+  },
+  "notaTempoDia": {
+    "Até 15 min":   "pouco tempo exige plano enxuto",
+    "15 a 30 min":  "dá pra fazer muito com 30 min bem usados",
+    "30 a 60 min":  "tempo suficiente pra treino completo",
+    "Mais de 1h":   "tempo não é o seu limite"
+  },
+  "notaBase": {
+    "Nunca treinei":     "começar do zero é vantagem: nenhum vício pra desfazer",
+    "Até 6 meses":       "base recente: hora de estruturar",
+    "6 meses a 2 anos":  "você já tem base pra progressão real",
+    "Mais de 2 anos":    "experiência é seu ativo, o plano respeita isso"
+  },
+  "fotoPorObjetivo": {
+    "emagrecimento": "esforço, luz dura",
+    "hipertrofia":   "série pesada, tensão no músculo",
+    "recomposicao":  "treino com peso livre",
+    "performance":   "corredor em esforço real"
+  }
+}
+</script>
+
+<script>
+  // Montagem da tela a partir das respostas do quiz.
+  // No app, troque a leitura da query string pelo estado real do quiz.
+  var D = JSON.parse(document.getElementById('diagnostico-data').textContent);
+  var q = new URLSearchParams(location.search);
+
+  var respostas = {
+    dor: q.get('dor') || 'nunca_comecei',              // sem_plano | sem_sustentar | travado | nunca_comecei
+    objetivo: q.get('objetivo') || 'performance',       // emagrecimento | hipertrofia | recomposicao | performance
+    afirmacao: Number(q.get('afirmacao') || 2),         // 1..5
+    tempoDia: q.get('tempoDia') || 'Mais de 1h',
+    tempoTreino: q.get('tempoTreino') || 'Nunca treinei'
+  };
+
+  var ver = D.veredito[respostas.dor][respostas.objetivo];
+  var gar = D.gargalo[respostas.dor];
+
+  document.getElementById('headline').textContent = ver.h;
+  document.getElementById('sub').textContent = ver.s;
+  document.getElementById('gargalo-titulo').textContent = gar.t;
+  document.getElementById('gargalo-texto').textContent = gar.x;
+  document.getElementById('fecho').textContent = D.fecho[respostas.objetivo];
+  document.getElementById('foto-fallback').textContent = 'Foto: ' + D.fotoPorObjetivo[respostas.objetivo];
+
+  // Consistência é a única métrica em percentual: valor da escala x 20.
+  var metricas = [
+    { label: 'Consistência hoje', value: (respostas.afirmacao * 20) + '%', note: D.notaConsistencia[respostas.afirmacao] },
+    { label: 'Tempo por dia', value: respostas.tempoDia, note: D.notaTempoDia[respostas.tempoDia] },
+    { label: 'Base de treino', value: respostas.tempoTreino, note: D.notaBase[respostas.tempoTreino] }
+  ];
+
+  document.getElementById('metrics').innerHTML = metricas.map(function (m) {
+    return '<div class="metric">' +
+      '<span class="metric-label"></span>' +
+      '<span class="metric-value"></span>' +
+      '<span class="metric-note"></span>' +
+    '</div>';
+  }).join('');
+
+  document.querySelectorAll('#metrics .metric').forEach(function (el, i) {
+    el.querySelector('.metric-label').textContent = metricas[i].label;
+    el.querySelector('.metric-value').textContent = metricas[i].value;
+    el.querySelector('.metric-note').textContent = metricas[i].note;
+  });
+</script>
+
+</body>
+</html>

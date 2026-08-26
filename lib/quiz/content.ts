@@ -57,12 +57,19 @@ export type ObjetivoOption = {
   icon: Icon;
   hue: Hue;
   photo: string;
+  heroPhoto: string;
   alt: string;
 };
 
 /** Fotos de referência (Unsplash). Trocar pelos assets definitivos do app. */
-const unsplash = (id: string) =>
-  `https://images.unsplash.com/photo-${id}?w=228&h=228&fit=crop&q=80`;
+const unsplash = (id: string, w: number, h: number) =>
+  `https://images.unsplash.com/photo-${id}?w=${w}&h=${h}&fit=crop&q=80`;
+
+/** Miniatura do card de opção. */
+const thumb = (id: string) => unsplash(id, 228, 228);
+
+/** Faixa larga usada como topo da tela de resultado. */
+const hero = (id: string) => unsplash(id, 860, 420);
 
 export const OBJETIVO_OPTS: ObjetivoOption[] = [
   {
@@ -71,7 +78,8 @@ export const OBJETIVO_OPTS: ObjetivoOption[] = [
     hint: "Perder peso e manter",
     icon: Flame,
     hue: P.orange,
-    photo: unsplash("1571019613454-1cb2f99b2d8b"),
+    photo: thumb("1571019613454-1cb2f99b2d8b"),
+    heroPhoto: hero("1571019613454-1cb2f99b2d8b"),
     alt: "Pessoa treinando no chão de um estúdio",
   },
   {
@@ -80,7 +88,8 @@ export const OBJETIVO_OPTS: ObjetivoOption[] = [
     hint: "Ganhar massa",
     icon: Barbell,
     hue: P.cyan,
-    photo: unsplash("1517836357463-d25dfeac3438"),
+    photo: thumb("1517836357463-d25dfeac3438"),
+    heroPhoto: hero("1517836357463-d25dfeac3438"),
     alt: "Pessoa se posicionando para levantar uma barra",
   },
   {
@@ -89,7 +98,8 @@ export const OBJETIVO_OPTS: ObjetivoOption[] = [
     hint: "Trocar gordura por músculo",
     icon: TrendUp,
     hue: P.mint,
-    photo: unsplash("1526506118085-60ce8714f8c5"),
+    photo: thumb("1526506118085-60ce8714f8c5"),
+    heroPhoto: hero("1526506118085-60ce8714f8c5"),
     alt: "Costas definidas de uma pessoa em barra fixa",
   },
   {
@@ -98,7 +108,8 @@ export const OBJETIVO_OPTS: ObjetivoOption[] = [
     hint: "Render e durar mais",
     icon: Target,
     hue: P.violet,
-    photo: unsplash("1552674605-db6ffd4facb5"),
+    photo: thumb("1552674605-db6ffd4facb5"),
+    heroPhoto: hero("1552674605-db6ffd4facb5"),
     alt: "Corredores em silhueta contra o céu",
   },
 ];

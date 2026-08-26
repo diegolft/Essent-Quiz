@@ -111,6 +111,9 @@ logo (reproduzido como barra + wordmark, conforme o handoff).
 
 ## Adendo: tela de Resultado (posterior ao handoff)
 
+> Atualizado: a tela foi redesenhada a partir de `diagnostico.html`. O texto abaixo
+> descreve a versão original; as diferenças estão na seção seguinte.
+
 Tela nova, não prevista no handoff, inserida entre a **análise** e a **captura**
 no fluxo fundador. Motivo: a análise de 6s promete um diagnóstico e a captura
 entregava um formulário — o resultado paga essa promessa antes de pedir o
@@ -144,3 +147,32 @@ falso e desmotivador.
 - **Divergência de copy assumida:** o CTA do resultado é "Quero minha vaga" e o da
   captura virou "Confirmar minha vaga". O handoff fixa "Quero minha vaga" na captura,
   mas mantê-lo deixaria dois CTAs idênticos em telas seguidas.
+
+### Redesign a partir de `diagnostico.html`
+
+O documento `diagnostico.html` na raiz substituiu o design acima. É referência de
+design, não código de produção. Mudou tanto a forma quanto o conteúdo:
+
+**Forma.** Faixa de foto de 190px no topo, escolhida pelo objetivo, com scrim que
+escurece o topo e dissolve a imagem no fundo do app, e a assinatura ESSENT sobre
+ela. As barras de progresso saíram: as métricas viraram tipográficas — rótulo
+versaleto à esquerda, valor em Barlow Condensed 19px à direita, nota na linha de
+baixo. O box do gargalo virou filete laranja + texto em itálico. Corpo com 22px
+de padding lateral e headline de 34px.
+
+**Conteúdo.** O veredito passou a ser uma matriz **dor × objetivo** (16
+combinações, headline e sub próprios) em vez de depender só da dor. O gargalo
+passou a vir da dor — direção / sustentação / ajuste / base — e não mais do menor
+medidor, então a paleta de apoio saiu da tela: ela é laranja e neutros.
+
+**Uma correção sobre o documento.** O `diagnostico.html` calcula a consistência
+como `afirmacao * 20`, o que inverte o sentido da pergunta: a afirmação do passo 3
+é negativa ("não consigo manter consistência"), então quem responde 5 (concordo
+totalmente) receberia "100% — consistência não é o seu problema". A implementação
+mantém `(6 - afirmacao) * 20` e reindexa as notas do documento pelo percentual, o
+que preserva toda a copy e corrige o sentido. Reverter para o comportamento
+literal do documento é uma linha em `lib/quiz/resultado.ts`.
+
+A foto do resultado reusa a mesma imagem do card do passo 2, num recorte largo
+(`heroPhoto` em `content.ts`) — o objetivo que ele escolheu volta como abertura do
+diagnóstico. Trocar por assets próprios é só mudar esse campo.
